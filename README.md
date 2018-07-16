@@ -35,6 +35,34 @@ type Mutation {
 }
 ```
 
+記事だと`type.json`を使っているが、jsonフォーマットは廃止されるらしいので、`gqlgen.yml`にする。
+
+```yml
+schema: ./schema.graphql
+exec:
+  filename: generated.go
+model:
+  filename: models_gen.go
+models:
+  User:
+    model: github.com/cipepser/gqlgen/graph.User
+```
+
+`graph/graph.go`を以下のようにする。
+
+```go
+package graph
+
+type User struct {
+	ID   string
+	Name string
+}
+```
+
+
+
+
+
 
 ## Rerefences
 * [GoでGraphQLを話すサーバを作ってみた](https://qiita.com/ichikawa_0829/items/964682e3450d828968b9)

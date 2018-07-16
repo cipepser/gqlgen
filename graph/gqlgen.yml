@@ -1,0 +1,8 @@
+schema: ./schema.graphql
+exec:
+  filename: generated.go
+model:
+  filename: models_gen.go
+models:
+  User:
+    model: github.com/cipepser/gqlgen/graph.User
