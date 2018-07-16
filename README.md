@@ -118,6 +118,95 @@ func (r *Resolver) Query_users(ctx context.Context) ([]User, error) {
 }
 ```
 
+## mainの実装
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/cipepser/gqlgen/graph"
+	"github.com/vektah/gqlgen/handler"
+)
+
+func main() {
+	resolvers := &graph.Resolver{}
+	http.Handle("/", handler.Playground("Todo", "/query"))
+	http.Handle("/query", handler.GraphQL(graph.MakeExecutableSchema(resolvers)))
+
+	fmt.Println("Listening on: 8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+```
+
+`go run main.go`で実行して`http://localhost:8080`にアクセスするとPlayGroundで遊べる。
+
+```graphql
+query {
+  users {
+    id
+    name
+  }
+}
+```
+
+や
+
+```graphql
+query {
+  user(id: "1") {
+    name
+  }
+}
+```
+
+などとするとレスポンスが返ってくる（この段階ではまだuserがいないのでnot foundしか返ってこない）。
+
+ユーザを登録するには以下。
+
+```graphql
+mutation ($NewUser: NewUser!) {
+  createUser(input: $NewUser) {
+    id,
+    name
+  }
+}
+```
+
+このとき一緒に`QEURY VARIABLES`を以下のように設定する。
+
+```json
+{
+  "NewUser": {
+    "name": "hoge"
+  }
+}
+```
+
+上記を実行する or `users`のクエリを投げると`id`がわかるので、以下のようにするとちゃんと`name`が返ってくる。
+
+```graphql
+query {
+  user(id: "5577006791947779410") {
+    name
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "user": {
+      "name": "hoge"
+    }
+  }
+}
+```
+
+記事ではTODOリストを追加しているがここでは割愛。
 
 ## Rerefences
 * [GoでGraphQLを話すサーバを作ってみた](https://qiita.com/ichikawa_0829/items/964682e3450d828968b9)
